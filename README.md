@@ -1,2 +1,2 @@
 # DataStructures
-C# projects looking at simple Datastructures
+C# project looking at simple Datastructures
