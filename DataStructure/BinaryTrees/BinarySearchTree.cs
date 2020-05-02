@@ -4,71 +4,78 @@ using System.Text;
 
 namespace DataStructure.BinaryTrees
 {
-    public class BinarySearchTree
+    public class BinarySearchTree : IBinarySearchTree
     {
         public BinarySearchTree(int value)
         {
-            Value = value;
+            Root = new Node
+            {
+                Value = value
+            };
         }
 
-        public int Value { get; private set; }
-        public BinarySearchTree Left { get; private set; }
-        public BinarySearchTree Right { get; private set; }
+        public Node Root { get; private set; }
 
-        public void AddValue(int value)
+        public bool Insert(int value)
         {
-            if(value == Value)
+            if(Root is null)
             {
-                return;
+                Root = new Node
+                {
+                    Value = value
+                };
+                return true;
             }
 
-            if (value < Value)
+            if(value == Root.Value)
             {
-                AddLeftValue(value);
+                return false;
             }
-            else
-            {
-                AddRightValue(value);
-            }
+
+            return value < Root.Value ?
+                Insert(value, ref Root.Left) :
+                Insert(value, ref Root.Right);
         }
 
-        public BinarySearchTree Search(int value)
+        public bool Insert(int value, ref Node node)
         {
-            if (value == Value)
+            if (node is null)
             {
-                return this;
+                node = new Node()
+                {
+                    Value = value
+                };
+                return true;
             }
-            
-            if (value < Value)
-            {
-                return Left?.Search(value);
+            if (value == node.Value) return false;
+            if (value < node.Value) {
+                return Insert(value, ref node.Left);
             }
+            return Insert(value, ref node.Right);
 
-            return Right?.Search(value);
         }
 
-        private void AddLeftValue(int value)
+        public bool Remove(int value)
         {
-            if (Left is null)
-            {
-                Left = new BinarySearchTree(value);
-            }
-            else
-            {
-                Left.AddValue(value);
-            }
+            throw new NotImplementedException();
         }
 
-        private void AddRightValue(int value)
+        public Node Find(int value)
         {
-            if (Right is null)
+            return Find(Root, value);
+        }
+
+        private Node Find(Node node, int value)
+        {
+            if (node is null)
             {
-                Right = new BinarySearchTree(value);
+                return null;
             }
-            else
+            if(node.Value == value)
             {
-                Right.AddValue(value);
+                return node;
             }
+            return node.Value > value ? Find(node.Left, value) : Find(node.Right, value);
         }
     }
 }
