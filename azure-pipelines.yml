@@ -5,7 +5,6 @@ trigger:
 - bug/*
 
 variables:
-  - group: Trayport
   - name: version 
     value: '0.0.1'
   - name: build 
@@ -66,22 +65,10 @@ jobs:
     # run tests
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
-      env:
-        TRAYPORT_SERVER: $(TRAYPORT_SERVER)
-        TRAYPORT_SERVER_PORT: $(TRAYPORT_SERVER_PORT)
-        TRAYPORT_SERVER_USER: $(TRAYPORT_SERVER_USER)
-        TRAYPORT_SERVER_PASSWORD: $(TRAYPORT_SERVER_PASSWORD)
       inputs:
         command: test
         projects: '**/*Tests/*.csproj'
         arguments: '--configuration $(buildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
-
-    - task: reportgenerator@4
-      displayName: 'Create Code coverage report'
-      inputs:
-        reports: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-        targetdir: '$(Build.SourcesDirectory)\CodeCoverage'
-        assemblyfilters: '+*;'
 
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage'
