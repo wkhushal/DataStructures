@@ -1,0 +1,103 @@
+# triggers for master, feature and bug branches
+trigger:
+- master
+- feature/*
+- bug/*
+
+variables:
+  - group: Trayport
+  - name: version 
+    value: '0.0.1'
+  - name: build 
+    value: $[counter(variables['version'], 0)]
+
+name: $(version).$(build)
+
+jobs:
+- job: BuildJob
+  pool:
+    name: 'GenericPool1'
+  
+  variables:
+    solution: '**/*.sln'
+    buildPlatform: 'Any CPU'
+    buildConfiguration: 'Release'
+    versionNumber: '$(version)'
+    versionRevision: $[counter(variables['versionNumber'], 0)]
+    fullVersionNumber: '$(version).$(versionRevision)'
+
+ # Steps
+  steps:
+    # set the env variables
+    - task: PowerShell@2
+      displayName: 'Update env'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host $env
+          $v=$env:BUILD_BUILDNUMBER
+          Write-Host $v
+          if($env:BUILD_SOURCEBRANCHNAME -ne "master")
+          {
+            $v="$v-rc"
+          }
+          
+          Write-Host $v
+          Write-Host "##vso[task.setvariable variable=packageVersion;]$v"
+          Write-Host "##vso[build.updatebuildnumber]$v"          
+        
+        
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)\**\*.sln'
+        feedsToUse: 'config'
+        
+
+    # build solution    
+    - task: DotNetCoreCLI@2
+      displayName: 'Build DataStructures'
+      inputs:
+        command: build
+        publishWebProjects: false
+        projects: $(Build.SourcesDirectory)\**\*.sln
+        arguments: '-c $(buildConfiguration) /p:Version=$(build.buildNumber)' 
+
+    # run tests
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      env:
+        TRAYPORT_SERVER: $(TRAYPORT_SERVER)
+        TRAYPORT_SERVER_PORT: $(TRAYPORT_SERVER_PORT)
+        TRAYPORT_SERVER_USER: $(TRAYPORT_SERVER_USER)
+        TRAYPORT_SERVER_PASSWORD: $(TRAYPORT_SERVER_PASSWORD)
+      inputs:
+        command: test
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+
+    - task: reportgenerator@4
+      displayName: 'Create Code coverage report'
+      inputs:
+        reports: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+        targetdir: '$(Build.SourcesDirectory)\CodeCoverage'
+        assemblyfilters: '+*;'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
+        reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'      
+
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet pack'
+      inputs:
+        command: 'pack'
+        packagesToPack: '$(Build.SourcesDirectory)\**\*.sln'
+        nobuild: true
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'packageVersion'
+        verbosityPack: 'Normal'
+    
