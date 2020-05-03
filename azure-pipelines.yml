@@ -14,8 +14,6 @@ name: $(version).$(build)
 
 jobs:
 - job: BuildJob
-  pool:
-    name: 'GenericPool1'
   
   variables:
     solution: '**/*.sln'
