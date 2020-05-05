@@ -45,11 +45,11 @@ jobs:
           Write-Host $(Build.SourcesDirectory)          
         
         
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'restore'
-        projects: '$(Build.SourcesDirectory)/**/DataStructure.sln'
-        feedsToUse: 'config'
+    #- task: DotNetCoreCLI@2
+    #  inputs:
+    #    command: 'restore'
+    #    projects: '$(Build.SourcesDirectory)/**/DataStructure.sln'
+    #    feedsToUse: 'config'
         
 
     # build solution    
