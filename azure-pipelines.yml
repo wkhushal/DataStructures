@@ -58,7 +58,7 @@ jobs:
       inputs:
         command: build
         publishWebProjects: false
-        projects: $(Build.SourcesDirectory)\**\DataStructure.sln
+        projects: $(Build.SourcesDirectory)/**/DataStructure.sln
         arguments: '-c $(buildConfiguration) /p:Version=$(build.buildNumber)' 
 
     # run tests
@@ -77,13 +77,13 @@ jobs:
         reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'      
 
 
-    ##- task: DotNetCoreCLI@2
-    ##  displayName: 'dotnet pack'
-    #  inputs:
-    #    command: 'pack'
-    #    packagesToPack: '$(Build.SourcesDirectory)\**\*.sln'
-    #    nobuild: true
-    #    versioningScheme: 'byEnvVar'
-    #    versionEnvVar: 'packageVersion'
-    #    verbosityPack: 'Normal'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet pack'
+      inputs:
+        command: 'pack'
+        packagesToPack: '$(Build.SourcesDirectory)/**/DataStructure.sln'
+        nobuild: true
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'packageVersion'
+        verbosityPack: 'Normal'
     
