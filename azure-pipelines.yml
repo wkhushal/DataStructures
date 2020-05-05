@@ -1,7 +1,7 @@
 # triggers for master, feature and bug branches
 trigger:
 - master
-- feature/*
+- feature*/*
 - bug/*
 
 variables:
@@ -76,13 +76,13 @@ jobs:
         reportDirectory: '$(Build.SourcesDirectory)/CodeCoverage'      
 
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet pack'
-      inputs:
-        command: 'pack'
-        packagesToPack: '$(Build.SourcesDirectory)\**\*.sln'
-        nobuild: true
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'packageVersion'
-        verbosityPack: 'Normal'
+    ##- task: DotNetCoreCLI@2
+    ##  displayName: 'dotnet pack'
+    #  inputs:
+    #    command: 'pack'
+    #    packagesToPack: '$(Build.SourcesDirectory)\**\*.sln'
+    #    nobuild: true
+    #    versioningScheme: 'byEnvVar'
+    #    versionEnvVar: 'packageVersion'
+    #    verbosityPack: 'Normal'
     
