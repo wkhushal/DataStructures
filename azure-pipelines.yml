@@ -42,7 +42,7 @@ jobs:
           Write-Host $v
           Write-Host "##vso[task.setvariable variable=packageVersion;]$v"
           Write-Host "##vso[build.updatebuildnumber]$v"
-          Write-Host $pwd          
+          Write-Host $(Build.SourcesDirectory)          
         
         
     #- task: DotNetCoreCLI@2
